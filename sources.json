@@ -1,0 +1,86 @@
+{
+  "repo": "vgmr-99/Aberxy",
+  "title": "影视TV 播放源配置合集",
+  "updated": "2026-10-23",
+  "applicable_software": [
+    "影视TV (FongMi/TV)",
+    "影视仓",
+    "猫影视",
+    "天微",
+    "TVBox",
+    "Pluto Player",
+    "影音壳子"
+  ],
+  "sources": [
+    {
+      "id": 1,
+      "category": "多仓聚合(点播)",
+      "name": "jsDelivr CDN 版",
+      "url": "https://cdn.jsdelivr.net/gh/ouyushan/tvbox-cfg@main/config/multi.json",
+      "usage": "点播主配置，加载饭太硬/潇洒/OK影视/高天流云等十余个子源",
+      "software": "影视TV、影视仓、猫影视、天微、TVBox、Pluto Player 等全部 TVBox 协议客户端",
+      "note": "jsDelivr 国内 CDN 加速，国内直连首选",
+      "status": "200"
+    },
+    {
+      "id": 2,
+      "category": "多仓聚合(点播)",
+      "name": "jsDelivr Fastly 版",
+      "url": "https://fastly.jsdelivr.net/gh/ouyushan/tvbox-cfg@main/config/multi.json",
+      "usage": "与第1条内容相同，走 Fastly 节点",
+      "software": "同上",
+      "note": "CDN 版限速/慢时作为同内容备用线路",
+      "status": "200"
+    },
+    {
+      "id": 3,
+      "category": "多仓聚合(点播)",
+      "name": "裸地址版",
+      "url": "https://raw.githubusercontent.com/ouyushan/tvbox-cfg/main/config/multi.json",
+      "usage": "直连 GitHub 源文件",
+      "software": "同上（海外/可直连 GitHub 环境）",
+      "note": "国内多数地区被墙/超时，仅推荐海外或已挂代理",
+      "status": "200"
+    },
+    {
+      "id": 4,
+      "category": "多仓聚合(点播)",
+      "name": "裸地址 + gh-proxy 反代版",
+      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/ouyushan/tvbox-cfg/main/config/multi.json",
+      "usage": "经 gh-proxy.com 反代 GitHub，等价第3条内容",
+      "software": "同上（国内被墙环境首选）",
+      "note": "解决国内 raw.githubusercontent 拉取失败；gh-proxy.com 失效可换其他 gh-proxy 域名",
+      "status": "200"
+    },
+    {
+      "id": 5,
+      "category": "直播源",
+      "name": "jsDelivr CDN 版(直播)",
+      "url": "https://cdn.jsdelivr.net/gh/ouyushan/tvbox-cfg@main/config/live.json",
+      "usage": "直播主配置，含 iptv-api 聚合(Guovin)/YueChan Live/ngo5 IPTV 等电视台",
+      "software": "影视TV(直播入口)、TVBox 系客户端",
+      "note": "jsDelivr 国内直连，首选",
+      "status": "200"
+    },
+    {
+      "id": 6,
+      "category": "直播源",
+      "name": "裸地址版(直播)",
+      "url": "https://raw.githubusercontent.com/ouyushan/tvbox-cfg/main/config/live.json",
+      "usage": "直播裸源，内容同上",
+      "software": "同上（海外/可直连 GitHub 环境）",
+      "note": "国内易超时，不推荐主力",
+      "status": "200"
+    },
+    {
+      "id": 7,
+      "category": "备用兜底",
+      "name": "fish.json",
+      "url": "https://6800.kstore.vip/fish.json",
+      "usage": "完整 TVBox 配置(自带 spider jar/logo/站点片单)，主配置失败兜底",
+      "software": "影视TV、TVBox 系客户端",
+      "note": "主配置报错时切换此地址兜底；第三方托管，稳定性不如 jsDelivr 版",
+      "status": "200"
+    }
+  ]
+}
