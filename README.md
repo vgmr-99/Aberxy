@@ -1,77 +1,89 @@
-# Aberxy · 影视TV 播放源配置合集
+# Aberxy · 影视TV 播放源与直播配置合集
 
-本仓库整理自《影视TV 介绍与配置》页面（2026.10.22 更新），收录 **7 条播放源配置地址**，覆盖「点播多仓聚合 / 直播 / 备用兜底」三类，并对每条写明**用途与适用软件**。所有地址已于 2026-10-23 实测返回 HTTP 200。
+本仓库整合两类影视配置，全部适配 **影视TV（FongMi/TV）** 及兼容 TVBox 协议的客户端：
 
-> 适用软件（均兼容 TVBox 协议）：**影视TV（FongMi/TV）**、影视仓、猫影视、天微、TVBox、Pluto Player、影音壳子等。
-> 核心用法：客户端「设置 → 配置地址」粘贴下方任一地址即可一键加载。
+1. **7 条播放源配置地址**（点播多仓聚合 / 直播 / 备用兜底），逐条附用途与适用软件说明；
+2. **影视TV 原生直播 LiveConfig**（`fongmi-live-config-full.json`，内嵌 **101 条已验证直播频道 + EPG 节目表**）。
 
----
-
-## 一、多仓聚合（点播）
-
-「多仓」即一次性把多个影视站点（爬虫源）聚合到一个界面。下列 4 条指向**同一个 `multi.json`**，只是分发节点不同，内容完全一致。
-
-### 1. jsDelivr CDN 版（推荐国内直连）
-- **地址**：`https://cdn.jsdelivr.net/gh/ouyushan/tvbox-cfg@main/config/multi.json`
-- **用途**：点播主配置。加载饭太硬(fty)、饭太硬极速、潇洒、OK影视、高天流云等十余个子源。
-- **适用软件**：影视TV、影视仓、猫影视、天微、TVBox、Pluto Player 等全部 TVBox 协议客户端。
-- **备注**：jsDelivr 国内有 CDN 加速，是最稳的国内直连入口，首选。
-
-### 2. jsDelivr Fastly 版
-- **地址**：`https://fastly.jsdelivr.net/gh/ouyushan/tvbox-cfg@main/config/multi.json`
-- **用途**：与第 1 条内容相同，走 Fastly 节点。
-- **适用软件**：同上。
-- **备注**：当 CDN 版偶发限速/慢时作为同内容备用线路。
-
-### 3. 裸地址版（raw.githubusercontent）
-- **地址**：`https://raw.githubusercontent.com/ouyushan/tvbox-cfg/main/config/multi.json`
-- **用途**：直连 GitHub 源文件。
-- **适用软件**：同上（海外网络或能直连 GitHub 的环境）。
-- **备注**：国内多数地区会被墙/超时，仅推荐海外或已挂代理的环境使用。
-
-### 4. 裸地址 + gh-proxy 反代版
-- **地址**：`https://gh-proxy.com/https://raw.githubusercontent.com/ouyushan/tvbox-cfg/main/config/multi.json`
-- **用途**：经 gh-proxy.com 反代 GitHub，等价第 3 条内容。
-- **适用软件**：同上（国内被墙环境首选）。
-- **备注**：专门解决国内 raw.githubusercontent 拉取失败问题；若 gh-proxy.com 失效可换其他 gh-proxy 域名。
+> 所有地址已于 2026-10-23 实测返回 HTTP 200。
+> 软件与配置仅供个人学习研究，不得商业分发或收费。
 
 ---
 
-## 二、直播源
+## 一、适用软件
 
-用于客户端「直播」入口加载电视台，与上面的点播源分开配置（部分客户端支持在点播配置里直接带直播）。
+![适用软件](assets/apps.svg)
 
-### 5. jsDelivr CDN 版（直播）
-- **地址**：`https://cdn.jsdelivr.net/gh/ouyushan/tvbox-cfg@main/config/live.json`
-- **用途**：直播主配置。含 iptv-api 聚合(Guovin)、YueChan Live(GNTV)、ngo5 IPTV(IPv4) 等多个电视台源，可分组选台、切线路。
-- **适用软件**：影视TV（直播入口）、TVBox 系客户端。
-- **备注**：jsDelivr 国内直连，首选。
+这些客户端都支持「配置地址」一键加载本仓库的播放源与直播配置：
 
-### 6. 裸地址版（直播）
-- **地址**：`https://raw.githubusercontent.com/ouyushan/tvbox-cfg/main/config/live.json`
-- **用途**：直播裸源，内容同上。
-- **适用软件**：同上（海外/可直连 GitHub 环境）。
-- **备注**：国内易超时，不推荐主力使用。
+| 软件 | 类型 | 说明 |
+|---|---|---|
+| 影视TV（FongMi/TV） | 原版 | 点播 + 直播，本仓库首选 |
+| 影视仓 / 猫影视 / 天微 | TVBox 系 | 多仓点播 |
+| TVBox | 原版框架 | 点播 + 直播 |
+| Pluto Player | TVBox 系 | 点播 + 直播 |
 
 ---
 
-## 三、备用兜底源
+## 二、播放源配置地址（7 条）
 
-### 7. fish.json（主配置拉取失败时用）
-- **地址**：`https://6800.kstore.vip/fish.json`
-- **用途**：一份**完整** TVBox 配置（自带 spider 爬虫 jar、logo、壁纸、弹幕、站点片单等），不依赖外部多仓分发。
-- **适用软件**：影视TV、TVBox 系客户端。
-- **备注**：当 multi.json 提示「配置拉取失败 / 加载错误」时切换此地址兜底，保证客户端不空。属临时/第三方托管，稳定性不如 jsDelivr 版。
+![播放源构成](assets/sources.svg)
+
+### 多仓聚合（点播）— 同一 `multi.json`，4 个分发节点
+
+| # | 名称 | 地址 | 用途 / 适用软件 | 备注 |
+|---|---|---|---|---|
+| 1 | jsDelivr CDN 版 | `https://cdn.jsdelivr.net/gh/ouyushan/tvbox-cfg@main/config/multi.json` | 点播主配置，加载饭太硬/潇洒/OK影视/高天流云等十余子源；影视TV、影视仓、猫影视、天微、TVBox、Pluto Player 等 | 国内直连首选 |
+| 2 | jsDelivr Fastly 版 | `https://fastly.jsdelivr.net/gh/ouyushan/tvbox-cfg@main/config/multi.json` | 同内容，Fastly 节点 | CDN 版慢时备用 |
+| 3 | 裸地址版 | `https://raw.githubusercontent.com/ouyushan/tvbox-cfg/main/config/multi.json` | 直连 GitHub 源 | 海外/代理环境用 |
+| 4 | gh-proxy 反代版 | `https://gh-proxy.com/https://raw.githubusercontent.com/ouyushan/tvbox-cfg/main/config/multi.json` | 经 gh-proxy 反代，等价第 3 条 | 专治国内被墙 |
+
+### 直播源 — `live.json`
+
+| # | 名称 | 地址 | 用途 / 适用软件 | 备注 |
+|---|---|---|---|---|
+| 5 | jsDelivr CDN 版 | `https://cdn.jsdelivr.net/gh/ouyushan/tvbox-cfg@main/config/live.json` | 直播主配置，含 iptv-api(Guovin)/YueChan/ngo5 IPTV 等电视台；影视TV 直播入口、TVBox 系 | 国内直连首选 |
+| 6 | 裸地址版 | `https://raw.githubusercontent.com/ouyushan/tvbox-cfg/main/config/live.json` | 直播裸源，内容同上 | 海外用 |
+
+### 备用兜底 — `fish.json`
+
+| # | 名称 | 地址 | 用途 / 适用软件 | 备注 |
+|---|---|---|---|---|
+| 7 | fish.json | `https://6800.kstore.vip/fish.json` | 完整 TVBox 配置（自带 spider jar + 站点片单），主配置拉取失败时报错切换 | 第三方托管，稳定性不如 jsDelivr 版 |
 
 ---
 
-## 使用三步（以影视TV 为例）
+## 三、影视TV 直播 LiveConfig（内嵌 101 条已验证频道）
 
-1. 打开客户端 → **设置 → 配置地址**。
-2. 粘贴上方「多仓聚合」任一地址（国内推荐 **第 1 条 jsDelivr CDN 版**）→ 保存，等待加载完成即可看到全部点播源。
-3. 直播源单独在「直播入口」填写 **第 5 条 live.json（jsDelivr 版）**；若主配置报错，改用 **第 7 条 fish.json** 兜底。
+本仓库另提供一份可直接导入影视TV 的直播配置，含 3 个可切换直播源：
 
-> 提示：国内网络优先选 **jsDelivr / Fastly** 版；若提示配置拉取失败，改用 gh-proxy 版或 fish.json 备用源。
+- **我的已验证存活源（101 条，内嵌）**：沙箱探测存活的直链，按分组内嵌，带台标 + EPG；
+- **akiralereal 精选直连（大陆）**：拉取原仓库 `IPTV.m3u`；
+- **akiralereal 海外直连（海外）**：拉取原仓库 `IPTV-overseas.m3u`。
+
+EPG 节目表：`http://epg.112114.xyz/pp.xml`（XMLTV，已验证可用）。
+
+**直接复制下面的配置地址导入影视TV 即可：**
+
+```
+https://raw.githubusercontent.com/vgmr-99/Aberxy/main/fongmi-live-config-full.json
+```
+
+> 注：纬来日本/纬来育乐两条为 RTMP，能否播放取决于播放核心（ijkplayer 支持、exoplayer 不支持）；其余均为 HLS/HTTP。
+
+---
+
+## 四、三步配置教程（以影视TV 为例）
+
+![三步流程](assets/flow.svg)
+
+![配置界面示意图](assets/ui-config.svg)
+
+1. **打开客户端 → 设置 → 配置地址**：在主界面进入「设置」，找到「配置地址 / 订阅地址」入口。
+2. **粘贴地址 → 保存**：点播复制上方「多仓聚合」任一地址（国内推荐 **第 1 条 jsDelivr CDN 版**），直播复制 **第 5 条 live.json（jsDelivr 版）**，或在支持多线路的客户端里再追加一条 live.json。
+3. **加载完成即可观看**：等待加载完成即可看到全部点播源与直播频道。
+
+> 若提示「配置拉取失败 / 加载错误」，改用 **gh-proxy 版**（第 4 条）或 **fish.json 备用源**（第 7 条）兜底。
 
 ---
 
