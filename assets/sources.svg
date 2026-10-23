@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 360" font-family="-apple-system,Segoe UI,Microsoft YaHei,sans-serif">
+  <rect width="680" height="360" fill="#f6faf8"/>
+  <text x="40" y="46" font-size="25" font-weight="800" fill="#0f172a">本仓库播放源构成</text>
+  <text x="40" y="74" font-size="14" fill="#475569">共 7 条配置地址 + 1 份影视TV 直播 LiveConfig（内嵌 101 条已验证频道）</text>
+  <g>
+    <rect x="40" y="100" width="280" height="90" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="40" y="100" width="8" height="90" rx="4" fill="#10b981"/>
+    <text x="64" y="134" font-size="16" font-weight="700" fill="#0f172a">🧩 多仓聚合（点播）</text>
+    <text x="64" y="162" font-size="13" fill="#475569">multi.json × 4 节点</text>
+    <text x="64" y="182" font-size="12" fill="#94a3b8">饭太硬 / 潇洒 / OK影视 / 高天流云…</text>
+  </g>
+  <g>
+    <rect x="360" y="100" width="280" height="90" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="360" y="100" width="8" height="90" rx="4" fill="#10b981"/>
+    <text x="384" y="134" font-size="16" font-weight="700" fill="#0f172a">📡 直播源</text>
+    <text x="384" y="162" font-size="13" fill="#475569">live.json × 2 节点</text>
+    <text x="384" y="182" font-size="12" fill="#94a3b8">iptv-api / YueChan / ngo5 IPTV…</text>
+  </g>
+  <g>
+    <rect x="40" y="210" width="280" height="90" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="40" y="210" width="8" height="90" rx="4" fill="#f59e0b"/>
+    <text x="64" y="244" font-size="16" font-weight="700" fill="#0f172a">🆘 备用兜底</text>
+    <text x="64" y="272" font-size="13" fill="#475569">fish.json × 1</text>
+    <text x="64" y="292" font-size="12" fill="#94a3b8">主配置拉取失败时报错切换</text>
+  </g>
+  <g>
+    <rect x="360" y="210" width="280" height="90" rx="16" fill="#ecfdf5" stroke="#c7f0dd"/>
+    <rect x="360" y="210" width="8" height="90" rx="4" fill="#059669"/>
+    <text x="384" y="244" font-size="16" font-weight="700" fill="#059669">📺 影视TV 直播 LiveConfig</text>
+    <text x="384" y="272" font-size="13" fill="#475569">fongmi-live-config-full.json</text>
+    <text x="384" y="292" font-size="12" fill="#059669">内嵌 101 条已验证频道 + EPG</text>
+  </g>
+  <text x="40" y="340" font-size="12" fill="#94a3b8">所有地址已于 2026-10-23 实测返回 HTTP 200。</text>
+</svg>
