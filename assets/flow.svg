@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 260" font-family="-apple-system,Segoe UI,Microsoft YaHei,sans-serif">
+  <rect width="680" height="260" fill="#f6faf8"/>
+  <text x="40" y="46" font-size="25" font-weight="800" fill="#0f172a">三步开始使用（以影视TV 为例）</text>
+  <text x="40" y="74" font-size="14" fill="#475569">核心流程：填配置地址 → 加载 → 看</text>
+  <g>
+    <rect x="40" y="110" width="180" height="110" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <circle cx="78" cy="148" r="20" fill="#10b981"/><text x="78" y="155" font-size="18" font-weight="800" text-anchor="middle" fill="#fff">1</text>
+    <text x="110" y="144" font-size="15" font-weight="700" fill="#0f172a">打开客户端</text>
+    <text x="58" y="186" font-size="12" fill="#475569">进入主界面</text>
+  </g>
+  <text x="226" y="172" font-size="26" fill="#10b981" text-anchor="middle">→</text>
+  <g>
+    <rect x="250" y="110" width="180" height="110" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <circle cx="288" cy="148" r="20" fill="#10b981"/><text x="288" y="155" font-size="18" font-weight="800" text-anchor="middle" fill="#fff">2</text>
+    <text x="320" y="144" font-size="15" font-weight="700" fill="#0f172a">设置 → 配置地址</text>
+    <text x="268" y="186" font-size="12" fill="#475569">找到入口</text>
+  </g>
+  <text x="436" y="172" font-size="26" fill="#10b981" text-anchor="middle">→</text>
+  <g>
+    <rect x="460" y="110" width="180" height="110" rx="16" fill="#ecfdf5" stroke="#c7f0dd"/>
+    <circle cx="498" cy="148" r="20" fill="#059669"/><text x="498" y="155" font-size="18" font-weight="800" text-anchor="middle" fill="#fff">3</text>
+    <text x="530" y="144" font-size="15" font-weight="700" fill="#0f172a">粘贴 → 加载</text>
+    <text x="478" y="186" font-size="12" fill="#059669">保存即可观看</text>
+  </g>
+  <text x="40" y="240" font-size="12" fill="#94a3b8">提示：国内网络优先选 jsDelivr / Fastly 版；若报错改用 gh-proxy 版或 fish.json 兜底。</text>
+</svg>
