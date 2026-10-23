@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 400" font-family="-apple-system,Segoe UI,Microsoft YaHei,sans-serif">
+  <rect width="680" height="400" fill="#f6faf8"/>
+  <text x="40" y="46" font-size="25" font-weight="800" fill="#0f172a">适用软件（均兼容 TVBox 协议）</text>
+  <text x="40" y="74" font-size="14" fill="#475569">这些客户端都支持「配置地址」一键加载本仓库的播放源与直播配置</text>
+  <g>
+    <rect x="40" y="100" width="190" height="120" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="40" y="100" width="190" height="8" rx="4" fill="#10b981"/>
+    <circle cx="78" cy="150" r="20" fill="#ecfdf5"/><text x="78" y="157" font-size="18" text-anchor="middle">📺</text>
+    <text x="108" y="146" font-size="15" font-weight="700" fill="#0f172a">影视TV</text>
+    <text x="108" y="166" font-size="11" fill="#94a3b8">FongMi/TV 原版</text>
+    <text x="58" y="200" font-size="12" fill="#475569">点播 + 直播</text>
+  </g>
+  <g>
+    <rect x="260" y="100" width="190" height="120" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="260" y="100" width="190" height="8" rx="4" fill="#10b981"/>
+    <circle cx="298" cy="150" r="20" fill="#ecfdf5"/><text x="298" y="157" font-size="18" text-anchor="middle">🎬</text>
+    <text x="328" y="146" font-size="15" font-weight="700" fill="#0f172a">影视仓</text>
+    <text x="328" y="166" font-size="11" fill="#94a3b8">TVBox 系</text>
+    <text x="278" y="200" font-size="12" fill="#475569">多仓点播</text>
+  </g>
+  <g>
+    <rect x="480" y="100" width="190" height="120" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="480" y="100" width="190" height="8" rx="4" fill="#10b981"/>
+    <circle cx="518" cy="150" r="20" fill="#ecfdf5"/><text x="518" y="157" font-size="18" text-anchor="middle">🐱</text>
+    <text x="548" y="146" font-size="15" font-weight="700" fill="#0f172a">猫影视</text>
+    <text x="548" y="166" font-size="11" fill="#94a3b8">TVBox 系</text>
+    <text x="498" y="200" font-size="12" fill="#475569">多仓点播</text>
+  </g>
+  <g>
+    <rect x="40" y="250" width="190" height="120" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="40" y="250" width="190" height="8" rx="4" fill="#10b981"/>
+    <circle cx="78" cy="300" r="20" fill="#ecfdf5"/><text x="78" y="307" font-size="18" text-anchor="middle">⚡</text>
+    <text x="108" y="296" font-size="15" font-weight="700" fill="#0f172a">天微</text>
+    <text x="108" y="316" font-size="11" fill="#94a3b8">TVBox 系</text>
+    <text x="58" y="350" font-size="12" fill="#475569">多仓点播</text>
+  </g>
+  <g>
+    <rect x="260" y="250" width="190" height="120" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="260" y="250" width="190" height="8" rx="4" fill="#10b981"/>
+    <circle cx="298" cy="300" r="20" fill="#ecfdf5"/><text x="298" y="307" font-size="18" text-anchor="middle">📦</text>
+    <text x="328" y="296" font-size="15" font-weight="700" fill="#0f172a">TVBox</text>
+    <text x="328" y="316" font-size="11" fill="#94a3b8">原版框架</text>
+    <text x="278" y="350" font-size="12" fill="#475569">点播 + 直播</text>
+  </g>
+  <g>
+    <rect x="480" y="250" width="190" height="120" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="480" y="250" width="190" height="8" rx="4" fill="#10b981"/>
+    <circle cx="518" cy="300" r="20" fill="#ecfdf5"/><text x="518" y="307" font-size="18" text-anchor="middle">▶️</text>
+    <text x="548" y="296" font-size="15" font-weight="700" fill="#0f172a">Pluto Player</text>
+    <text x="548" y="316" font-size="11" fill="#94a3b8">TVBox 系</text>
+    <text x="498" y="350" font-size="12" fill="#475569">点播 + 直播</text>
+  </g>
+</svg>
