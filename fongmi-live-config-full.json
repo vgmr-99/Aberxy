@@ -1,0 +1,743 @@
+{
+ "lives": [
+  {
+   "name": "我的已验证存活源(101条,内嵌)",
+   "groups": [
+    {
+     "name": "体育",
+     "channel": [
+      {
+       "name": "纬来体育",
+       "urls": [
+        "https://hlsz.yjjcfw.com/live/vl.m3u8?expire=1786948372&sign=2e4a56b89fe644db147552011f972714"
+       ]
+      },
+      {
+       "name": "World Poker Tour",
+       "urls": [
+        "https://amg00477-samsungelectron-worldpokertour-samsunguk-81igb.amagi.tv/playlist/amg00477-samsungelectron-worldpokertour-samsunguk/playlist.m3u8"
+       ]
+      },
+      {
+       "name": "Red Bull TV",
+       "urls": [
+        "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master_6660.m3u8"
+       ]
+      },
+      {
+       "name": "NHL FAST",
+       "urls": [
+        "https://nhl-firetv.amagi.tv/playlist1080p.m3u8"
+       ]
+      },
+      {
+       "name": "Sky Racing 1",
+       "urls": [
+        "https://636ffd31f0e12.streamlock.net/RacingStream1/RacingStream1/playlist.m3u8"
+       ]
+      },
+      {
+       "name": "Sky Racing 2",
+       "urls": [
+        "https://636ffd31f0e12.streamlock.net/RacingStream2/RacingStream2/playlist.m3u8"
+       ]
+      },
+      {
+       "name": "World of Freesports",
+       "urls": [
+        "https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/1080p-en/index.m3u8"
+       ]
+      },
+      {
+       "name": "FUEL TV",
+       "urls": [
+        "https://amg01074-fueltv-fueltvemeaen-rakuten-b6j62.amagi.tv/hls/amagi_hls_data_rakutenAA-fueltvemeaen/CDN/master.m3u8"
+       ]
+      },
+      {
+       "name": "FloRacing",
+       "urls": [
+        "https://amg02278-amg02278c1-flosports-worldwide-7592.playouts.now.amagi.tv/1080p-cc/index.m3u8"
+       ]
+      },
+      {
+       "name": "SportsGrid",
+       "urls": [
+        "https://sportsgrid-tribal.amagi.tv/playlist1080p.m3u8"
+       ]
+      },
+      {
+       "name": "ACCDN",
+       "urls": [
+        "https://raycom-accdn-firetv.amagi.tv/1080p-cc/index.m3u8"
+       ]
+      },
+      {
+       "name": "Pac-12 Insider",
+       "urls": [
+        "https://pac12-firetv.amagi.tv/1080p-en-cc/index.m3u8"
+       ]
+      },
+      {
+       "name": "Trace Sport Stars",
+       "urls": [
+        "https://lightning-tracesport-samsungau.amagi.tv/playlist1080p.m3u8"
+       ]
+      },
+      {
+       "name": "beIN Sports Xtra",
+       "urls": [
+        "https://bein-xtra-bein.amagi.tv/playlistR1080p.m3u8"
+       ],
+       "logo": "https://image.xumo.com/v1/channels/channel/99991387/168x168.png?type=color_onBlack"
+      },
+      {
+       "name": "FIFA+",
+       "urls": [
+        "https://d2w9q46ikgrcwx.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-of5cbk3sav3w5/v1/sysdata_s_p_a_fifa_7/samsungheadend_us/latest/main/hls/playlist.m3u8"
+       ]
+      },
+      {
+       "name": "Tennis Channel International",
+       "urls": [
+        "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01444-tennischannelth-tennischnlintl-lggb/playlist.m3u8"
+       ]
+      },
+      {
+       "name": "MTRSPT1",
+       "urls": [
+        "https://amg02873-kravemedia-mtrspt1-samsungau-2anp4.amagi.tv/playlist/amg02873-kravemedia-mtrspt1-samsungau/playlist.m3u8"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "香港",
+     "channel": [
+      {
+       "name": "耀才财经",
+       "urls": [
+        "https://v3.mediacast.hk/webcast/bshdlive-pc/playlist.m3u8"
+       ]
+      },
+      {
+       "name": "TVB新闻",
+       "urls": [
+        "https://cdn6.cc.cd/163189/wxxw"
+       ],
+       "logo": "https://epg.112114.xyz/logo/TVB%E6%96%B0%E9%97%BB.png"
+      },
+      {
+       "name": "明珠台",
+       "urls": [
+        "https://cdn.qd.je/163189/mzt"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E6%98%8E%E7%8F%A0%E5%8F%B0(%E5%AD%97%E5%B9%95).png"
+      },
+      {
+       "name": "TVB娱乐新闻台",
+       "urls": [
+        "https://cdn6.cc.cd/163189/ylxw"
+       ],
+       "logo": "https://epg.112114.xyz/logo/TVB%E5%A8%B1%E4%B9%90%E6%96%B0%E9%97%BB%E5%8F%B0.png"
+      },
+      {
+       "name": "TVB1",
+       "urls": [
+        "https://cdn6.cc.cd/163189/tvb1"
+       ],
+       "logo": "https://epg.112114.xyz/logo/TVB1.png"
+      },
+      {
+       "name": "TVBJ1",
+       "urls": [
+        "https://cdn6.cc.cd/163189/j1"
+       ],
+       "logo": "https://epg.112114.xyz/logo/TVBJ1.png"
+      },
+      {
+       "name": "无线新闻台",
+       "urls": [
+        "https://cdn6.cc.cd/163189/wxxwt"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E6%97%A0%E7%BA%BF%E6%96%B0%E9%97%BB%E5%8F%B0.png"
+      },
+      {
+       "name": "TVBPlus",
+       "urls": [
+        "https://cdn3.indevs.in/stream/tvb/tvbp/"
+       ],
+       "logo": "https://epg.112114.xyz/logo/TVBPlus.png"
+      },
+      {
+       "name": "HOY TV",
+       "urls": [
+        "https://cdn.qd.je/163189/hoy"
+       ],
+       "logo": "https://epg.112114.xyz/logo/HOY%20TV.png"
+      },
+      {
+       "name": "HOY资讯台",
+       "urls": [
+        "https://cdn.qd.je/163189/hoy78"
+       ],
+       "logo": "https://epg.112114.xyz/logo/HOY%E8%B5%84%E8%AE%AF%E5%8F%B0.png"
+      },
+      {
+       "name": "HOY国际财经台",
+       "urls": [
+        "https://cdn.qd.je/163189/hoy76"
+       ],
+       "logo": "https://epg.112114.xyz/logo/HOY%E5%9B%BD%E9%99%85%E8%B4%A2%E7%BB%8F%E5%8F%B0.png"
+      },
+      {
+       "name": "NOW新闻台",
+       "urls": [
+        "https://cdn.qd.je/163189/now"
+       ],
+       "logo": "https://epg.112114.xyz/logo/NOW%E6%96%B0%E9%97%BB%E5%8F%B0.png"
+      },
+      {
+       "name": "RTHK31",
+       "urls": [
+        "https://cdn.qd.je/163189/rthk31"
+       ],
+       "logo": "https://epg.112114.xyz/logo/RTHK31.png"
+      },
+      {
+       "name": "RTHK32",
+       "urls": [
+        "https://cdn.qd.je/163189/rthk32"
+       ],
+       "logo": "https://epg.112114.xyz/logo/RTHK32.png"
+      },
+      {
+       "name": "翡翠台",
+       "urls": [
+        "https://cdn3.indevs.in/stream/tvb/fct/"
+       ]
+      },
+      {
+       "name": "凤凰香港",
+       "urls": [
+        "https://cdn.qd.je/163189/fhhk"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "宠物",
+     "channel": [
+      {
+       "name": "Pet Club TV",
+       "urls": [
+        "https://petclub-samsungaus.amagi.tv/playlist1080p.m3u8"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "文旅",
+     "channel": [
+      {
+       "name": "WildEarth",
+       "urls": [
+        "https://wildearth-plex.amagi.tv/masterR1080p.m3u8"
+       ]
+      },
+      {
+       "name": "Love Nature 4K",
+       "urls": [
+        "https://pb-ehs1glsha1juy.akamaized.net/v1/manifest/3722c60a815c199d9c0ef36c5b73da68a62b09d1/pb-ehs1glsha1juy/f2141f37-1f48-475b-ba54-b9efb62346db/0.m3u8"
+       ],
+       "logo": "https://images.sr.roku.com/idType/roku-trc/context/trc/id/479fe0d11f3f5132a3f36b617547da3b/https%3A%2F%2Fimage.roku.com%2Fbh-uploads%2Fproduction%2FinfoHUDLogo%2F1738776545554_LoveNature_logos_HUB_Centered.png"
+      },
+      {
+       "name": "CGTN Documentary",
+       "urls": [
+        "https://english-livebkali.cgtn.com/live/doccgtn.m3u8"
+       ]
+      },
+      {
+       "name": "China Travel",
+       "urls": [
+        "https://fastlive.cctvplus.com/out/v1/ca6f9297b7314a63959435028af287fc/index.m3u8"
+       ]
+      },
+      {
+       "name": "History Hit",
+       "urls": [
+        "https://lds-timeline-rakuten.amagi.tv/1080p-cc/index.m3u8"
+       ]
+      },
+      {
+       "name": "Court TV",
+       "urls": [
+        "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01438-ewscrippscompan-courttv-tablo/playlist.m3u8"
+       ]
+      },
+      {
+       "name": "Documentary+",
+       "urls": [
+        "https://ef79b15c8c7c46c7a9de9d33001dbd07.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-859-DOCUMENTARYPLUS-DOCUMENTARYPLUS/mt/documentaryplus/859/hls/master/playlist.m3u8"
+       ]
+      },
+      {
+       "name": "InTravel",
+       "urls": [
+        "https://amg00861-amg00861c10-rakuten-uk-3152.playouts.now.amagi.tv/1080p/index.m3u8"
+       ]
+      },
+      {
+       "name": "NASA+",
+       "urls": [
+        "https://ee119c17e6ed643893ff6ae377fe0693.7wzuvg.channel-assembly.mediatailor.us-east-1.amazonaws.com/v1/channel/NASAPrime/NASAPlus.m3u8"
+       ]
+      },
+      {
+       "name": "Gusto TV",
+       "urls": [
+        "https://dbrb49pjoymg4.cloudfront.net/10001/99991328/hls/playlist.m3u8?ads.xumo_channelId=99991328"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "国际",
+     "channel": [
+      {
+       "name": "CNA",
+       "urls": [
+        "https://d2e1asnsl7br7b.cloudfront.net/7782e205e72f43aeb4a48ec97f66ebbe/index_5.m3u8"
+       ]
+      },
+      {
+       "name": "Reuters",
+       "urls": [
+        "https://dbrb49pjoymg4.cloudfront.net/manifest/3fec3e5cac39a52b2132f9c66c83dae043dc17d4/prod_default_xumo-ams-aws/e7493ea5-5c1c-4d7a-a3f7-e95516048ad8/3.m3u8"
+       ],
+       "logo": "https://provider-static.plex.tv/epg/cms/production/8cf9c131-2d92-4d91-86b1-22ef458d703f/reuters_reutersnow_1RDX.png"
+      },
+      {
+       "name": "France 24 Français",
+       "urls": [
+        "https://live.france24.com/hls/live/2037179-b/F24_FR_HI_HLS/master_5000.m3u8"
+       ]
+      },
+      {
+       "name": "France 24 English",
+       "urls": [
+        "https://live.france24.com/hls/live/2037218-b/F24_EN_HI_HLS/master_5000.m3u8"
+       ]
+      },
+      {
+       "name": "NEWS1",
+       "urls": [
+        "https://server1.streamssl.com/stream/news1_mid.m3u8"
+       ]
+      },
+      {
+       "name": "France 24 Español",
+       "urls": [
+        "https://live.france24.com/hls/live/2037220-b/F24_ES_HI_HLS/master_5000.m3u8"
+       ]
+      },
+      {
+       "name": "Thai PBS",
+       "urls": [
+        "https://thaipbs-mcx0wm.cdn.byteark.com/vtt-live/playlist.m3u8"
+       ]
+      },
+      {
+       "name": "Bloomberg TV Asia",
+       "urls": [
+        "https://www.bloomberg.com/media-manifest/streams/asia.m3u8"
+       ]
+      },
+      {
+       "name": "Bloomberg TV Europe",
+       "urls": [
+        "https://www.bloomberg.com/media-manifest/streams/eu.m3u8"
+       ]
+      },
+      {
+       "name": "Bloomberg TV US",
+       "urls": [
+        "https://www.bloomberg.com/media-manifest/streams/us.m3u8"
+       ]
+      },
+      {
+       "name": "DW English",
+       "urls": [
+        "https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/master.m3u8"
+       ]
+      },
+      {
+       "name": "TRT World",
+       "urls": [
+        "https://tv-trtworld.medya.trt.com.tr/master.m3u8"
+       ]
+      },
+      {
+       "name": "Al Jazeera English",
+       "urls": [
+        "https://live-hls-web-aje-gcp.thehlive.com/AJE/index.m3u8"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "江苏",
+     "channel": [
+      {
+       "name": "苏州新闻综合",
+       "urls": [
+        "https://live-auth.51kandianshi.com/szgd/csztv1.m3u8"
+       ]
+      },
+      {
+       "name": "苏州社会经济",
+       "urls": [
+        "https://live-auth.51kandianshi.com/szgd/csztv2.m3u8"
+       ]
+      },
+      {
+       "name": "苏州文化生活",
+       "urls": [
+        "https://live-auth.51kandianshi.com/szgd/csztv3.m3u8"
+       ]
+      },
+      {
+       "name": "苏州电影娱乐",
+       "urls": [
+        "https://live-auth.51kandianshi.com/szgd/csztv4.m3u8"
+       ]
+      },
+      {
+       "name": "苏州生活资讯",
+       "urls": [
+        "https://live-auth.51kandianshi.com/szgd/csztv5.m3u8"
+       ]
+      },
+      {
+       "name": "苏州4K",
+       "urls": [
+        "https://live-auth.51kandianshi.com/szgd/csztv4k_4k.m3u8"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "福建",
+     "channel": [
+      {
+       "name": "德化电视台",
+       "urls": [
+        "https://play.cmptp.fjgdwl.com/live/63a563ec75764af588f3215b0afa2588.m3u8"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "青海",
+     "channel": [
+      {
+       "name": "西宁新闻综合",
+       "urls": [
+        "https://liveout.xntv.tv/a65jur/96iln2.m3u8"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "娱乐时尚",
+     "channel": [
+      {
+       "name": "FashionTV Paris L'Original",
+       "urls": [
+        "https://ftv1.b-cdn.net/bfdbb576-83f7-11f0-9f89-0200170e3e04_1000028043_HLS/manifest.m3u8"
+       ]
+      },
+      {
+       "name": "Global Fashion Channel",
+       "urls": [
+        "https://pubgfc.teleosmedia.com/linear/globalfashionchannel/globalfashionchannel/playlist.m3u8"
+       ]
+      },
+      {
+       "name": "Qello Concerts",
+       "urls": [
+        "https://lotus.stingray.com/manifest/qello-qello001-montreal/samsungtvplus/master.m3u8"
+       ]
+      },
+      {
+       "name": "Totalmusic Concerts",
+       "urls": [
+        "https://cdn.40mediagroup.com/live/c7eds/Totalmusic_Concerts/SA_LIVE_hls_enc/master.m3u8"
+       ]
+      },
+      {
+       "name": "Wipeout Xtra",
+       "urls": [
+        "https://amg00627-banijaygroup-wipeoutxtraau-samsungau-ashbl.amagi.tv/playlist/amg00627-banijaygroup-wipeoutxtraau-samsungau/playlist.m3u8"
+       ]
+      },
+      {
+       "name": "Graham Norton",
+       "urls": [
+        "https://amg00654-itv-amg00654c35-rakuten-gb-7598.playouts.now.amagi.tv/playlist1080_p.m3u8"
+       ]
+      },
+      {
+       "name": "Mystery TV",
+       "urls": [
+        "https://aenetworks-mysterytv-rakuten.amagi.tv/1080p-vtt/index.m3u8"
+       ]
+      },
+      {
+       "name": "Estrella TV",
+       "urls": [
+        "https://estrellatv-oando.amagi.tv/playlistR1080p.m3u8"
+       ]
+      },
+      {
+       "name": "MovieSphere",
+       "urls": [
+        "https://amg00353-lionsgatefilmsi-moviesphereaus-samsungau-7qzhf.amagi.tv/playlist/amg00353-lionsgatefilmsi-moviesphereaus-samsungau/playlist.m3u8"
+       ]
+      },
+      {
+       "name": "Rai Italia",
+       "urls": [
+        "https://d3k8wzt41aflvx.cloudfront.net/RAIHD/Live.m3u8"
+       ]
+      },
+      {
+       "name": "Rai World Premium",
+       "urls": [
+        "https://d3k8wzt41aflvx.cloudfront.net/RAIP/Live.m3u8"
+       ]
+      },
+      {
+       "name": "Mediaset Italia",
+       "urls": [
+        "https://d3k8wzt41aflvx.cloudfront.net/Mediaset_AU/Live.m3u8"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "韩国",
+     "channel": [
+      {
+       "name": "Arirang",
+       "urls": [
+        "https://amdlive-ch01-g-ctnd-com.akamaized.net/arirang_1gch/smil:arirang_1gch.smil/playlist.m3u8"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "台湾",
+     "channel": [
+      {
+       "name": "纬来日本",
+       "urls": [
+        "rtmp://f13h.mine.nu/sat/tv771"
+       ],
+       "logo": "https://epg.pw/media/images/channel/2023/07/22/large/20230722105459178241_22.png"
+      },
+      {
+       "name": "纬来育乐",
+       "urls": [
+        "rtmp://f13h.mine.nu/sat/tv701"
+       ],
+       "logo": "https://epg.pw/media/images/channel/2023/07/22/large/20230722124851344289_73.png"
+      }
+     ]
+    },
+    {
+     "name": "澳门",
+     "channel": [
+      {
+       "name": "澳视澳门",
+       "urls": [
+        "https://cdn.qd.je/163189/asam"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E6%BE%B3%E8%A7%86%E6%BE%B3%E9%97%A8.png"
+      },
+      {
+       "name": "澳视卫星",
+       "urls": [
+        "https://cdn.qd.je/163189/as"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E6%BE%B3%E8%A7%86%E5%8D%AB%E6%98%9F.png"
+      },
+      {
+       "name": "澳门体育",
+       "urls": [
+        "https://cdn.qd.je/163189/amty"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E6%BE%B3%E9%97%A8%E4%BD%93%E8%82%B2.png"
+      },
+      {
+       "name": "澳门综艺",
+       "urls": [
+        "https://cdn.qd.je/163189/amzy"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E6%BE%B3%E9%97%A8%E7%BB%BC%E8%89%BA.png"
+      },
+      {
+       "name": "澳门莲花",
+       "urls": [
+        "https://cdn.qd.je/163189/amlh"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E6%BE%B3%E9%97%A8%E8%8E%B2%E8%8A%B1.png"
+      }
+     ]
+    },
+    {
+     "name": "新加坡",
+     "channel": [
+      {
+       "name": "CH5",
+       "urls": [
+        "https://cdn.qd.je/163189/ch5"
+       ],
+       "logo": "https://epg.112114.xyz/logo/CH5.png"
+      },
+      {
+       "name": "CH8",
+       "urls": [
+        "https://cdn.qd.je/163189/ch8"
+       ],
+       "logo": "https://epg.112114.xyz/logo/CH8.png"
+      },
+      {
+       "name": "CHU",
+       "urls": [
+        "https://cdn.qd.je/163189/chu"
+       ],
+       "logo": "https://epg.112114.xyz/logo/CHU.png"
+      }
+     ]
+    },
+    {
+     "name": "马来西亚",
+     "channel": [
+      {
+       "name": "Astro AOD",
+       "urls": [
+        "https://cdn.qd.je/163189/aod"
+       ],
+       "logo": "https://epg.112114.xyz/logo/Astro%20AOD.png"
+      },
+      {
+       "name": "Astro欢喜台",
+       "urls": [
+        "https://cdn.qd.je/163189/hxt"
+       ],
+       "logo": "https://epg.112114.xyz/logo/Astro%E6%AC%A2%E5%96%9C%E5%8F%B0.png"
+      }
+     ]
+    },
+    {
+     "name": "影视",
+     "channel": [
+      {
+       "name": "TVB星河",
+       "urls": [
+        "https://cdn6.cc.cd/163189/tvbxh"
+       ],
+       "logo": "https://epg.112114.xyz/logo/TVB%E6%98%9F%E6%B2%B3.png"
+      },
+      {
+       "name": "TVB亚洲武侠",
+       "urls": [
+        "https://cdn6.cc.cd/163189/yzwx"
+       ],
+       "logo": "https://epg.112114.xyz/logo/TVB%E4%BA%9A%E6%B4%B2%E6%AD%A6%E4%BE%A0.png"
+      },
+      {
+       "name": "重温经典",
+       "urls": [
+        "https://cdn.qd.je/163189/cwjd"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E9%87%8D%E6%B8%A9%E7%BB%8F%E5%85%B8.png"
+      },
+      {
+       "name": "龙华电影",
+       "urls": [
+        "https://cdn.qd.je/163189/lhdy"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E9%BE%99%E5%8D%8E%E7%94%B5%E5%BD%B1.png"
+      },
+      {
+       "name": "龙华经典",
+       "urls": [
+        "https://cdn.qd.je/163189/lhjd"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E9%BE%99%E5%8D%8E%E7%BB%8F%E5%85%B8.png"
+      },
+      {
+       "name": "龙华偶像",
+       "urls": [
+        "https://cdn.qd.je/163189/lhox"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E9%BE%99%E5%8D%8E%E5%81%B6%E5%83%8F.png"
+      },
+      {
+       "name": "龙华日韩",
+       "urls": [
+        "https://cdn.qd.je/163189/lhrh"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E9%BE%99%E5%8D%8E%E6%97%A5%E9%9F%A9.png"
+      },
+      {
+       "name": "龙华戏剧",
+       "urls": [
+        "https://cdn.qd.je/163189/lhxj"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E9%BE%99%E5%8D%8E%E6%88%8F%E5%89%A7.png"
+      },
+      {
+       "name": "龙华洋片",
+       "urls": [
+        "https://cdn.qd.je/163189/lhyp"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E9%BE%99%E5%8D%8E%E6%B4%8B%E7%89%87.png"
+      },
+      {
+       "name": "龙华卡通",
+       "urls": [
+        "https://cdn.qd.je/163189/lhkt"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E9%BE%99%E5%8D%8E%E5%8D%A1%E9%80%9A.png"
+      },
+      {
+       "name": "天映频道",
+       "urls": [
+        "https://cdn.qd.je/163189/typd"
+       ],
+       "logo": "https://epg.112114.xyz/logo/%E5%A4%A9%E6%98%A0%E6%96%B0%E5%8A%A0%E5%9D%A1.png"
+      }
+     ]
+    }
+   ],
+   "epg": "http://epg.112114.xyz/pp.xml",
+   "logo": "https://epg.112114.xyz/logo/{name}.png",
+   "boot": false
+  },
+  {
+   "name": "akiralereal 精选直连(大陆)",
+   "url": "https://raw.githubusercontent.com/akiralereal/iptv/main/IPTV.m3u",
+   "epg": "http://epg.112114.xyz/pp.xml",
+   "boot": false
+  },
+  {
+   "name": "akiralereal 海外直连(海外)",
+   "url": "https://raw.githubusercontent.com/akiralereal/iptv/main/IPTV-overseas.m3u",
+   "boot": false
+  }
+ ]
+}
