@@ -1,0 +1,17 @@
+{
+  "spider": "",
+  "sites": [
+    {
+      "key": "souju",
+      "name": "搜剧AI souju.ai",
+      "type": 3,
+      "api": "https://raw.githubusercontent.com/vgmr-99/Aberxy/main/souju_spider.js",
+      "searchable": 1,
+      "playable": 1,
+      "ext": ""
+    }
+  ],
+  "rules": {},
+  "parses": [],
+  "flags": []
+}
