@@ -1,15 +1,18 @@
 /*
- * souju_spider.js — 搜剧AI(souju.ai) 影视TV(FongMi/TV) 单采集源
+ * souju_spider.js — 搜剧AI(souju.ai) 影视TV(FongMi/TV) 单采集源  v3
+ *
+ * 修复记录：
+ *  v3: ① 分类改用服务端真实参数 kind=（此前 intent= 被忽略→所有分类同一批内容）
+ *      ② home() 返回整站 6 个真实分类：剧集/电影/动漫/短剧/综艺/纪录片
+ *      ③ 搜索改用服务端 q= 参数（此前翻页过滤，深页内容搜不到）
+ *      ④ 多播放源：detail 时解析第1集拿全部线路(ikun资源/魔都资源...)，
+ *         每条线路一个播放组，播放器内可直接切换线路；
+ *         多季作品自动展开为"第N季"分组。
  *
  * 遵循 FongMi/CatVodSpider QuickJS 官方契约：
- *   - ES module：export default 为工厂函数 default(site) → 返回实例对象
- *   - 方法：init/home/homeVod/category/detail/search/play/proxy/destroy
- *   - 网络：注入的 net.http(url, {method,headers,timeout}) → {code, content, error}（异步，App await）
- *   - 加密：内置纯 JS HMAC-SHA256（不依赖宿主 crypto，兼容性最好）
- *
- * 配置（type 必须 3，api 以 .js 结尾）：
- *   {"key":"souju","name":"搜剧AI souju.ai","type":3,
- *    "api":"<本文件公网URL>","searchable":1,"playable":1}
+ *   ES module export default 工厂；方法 init/home/homeVod/category/detail/search/play/proxy/destroy；
+ *   网络 net.http(url,{method,headers,timeout}) → {code,content,error}（异步）。
+ * 配置（type 必须 3，api 以 .js 结尾）。
  */
 
 // ===================== 纯 JS HMAC-SHA256（无依赖，已逐字节对验 node crypto） =====================
@@ -32,11 +35,6 @@ function _hexToBytes(hex) {
     var out = [];
     for (var i = 0; i < hex.length; i += 2) out.push(parseInt(hex.substr(i, 2), 16));
     return out;
-}
-function _bytesToStr(bytes) {
-    var s = '';
-    for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i] & 0xff);
-    return s;
 }
 
 var _K = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -125,43 +123,59 @@ async function _http(path) {
     if (resp.error) throw new Error('HTTP失败: ' + resp.error);
     var body = resp.content;
     if (typeof body !== 'string') body = new TextDecoder().decode(body);
-    return JSON.parse(body);
+    var data = JSON.parse(body);
+    if (!data || !data.cards) return data;
+    return data;
 }
 
-function _m3u8List(data) {
-    var out = [];
-    var seen = {};
-    function push(u) {
-        if (!u || typeof u !== 'string' || !/\.m3u8|\.mp4|\.flv/.test(u)) return;
-        if (seen[u]) return;
-        seen[u] = 1;
-        out.push(u);
+// 目录查询：kind 分类过滤 / q 搜索，统一走 /v1/browse/catalog
+async function _catalog(params) {
+    var qs = 'limit=20';
+    for (var k in params) if (params[k] !== undefined && params[k] !== null && params[k] !== '') {
+        qs += '&' + k + '=' + encodeURIComponent(params[k]);
     }
-    function walk(o) {
-        if (!o) return;
-        if (typeof o === 'string') { push(o); return; }
-        if (Array.isArray(o)) { o.forEach(walk); return; }
-        if (typeof o === 'object') {
-            Object.keys(o).forEach(function (k) {
-                if (/url|play|uri|source/i.test(k)) walk(o[k]);
-                else if (typeof o[k] === 'object') walk(o[k]);
-            });
-        }
-    }
-    walk(data);
-    return out;
+    return await _http('/v1/browse/catalog?' + qs);
 }
 
 function _cardToVod(c) {
-    var remark = '';
-    if (c.episode_count || c.episodes_count) remark = '更新至' + (c.episode_count || c.episodes_count) + '集';
-    else if (c.remark) remark = c.remark;
     return {
         vod_id: c.id,
         vod_name: c.title || c.name || '',
-        vod_pic: c.poster_url || c.cover || '',
-        vod_remarks: remark,
+        vod_pic: c.poster_url || '',
+        vod_remarks: c.remarks || (c.year ? String(c.year) : ''),
     };
+}
+
+// 从 resolve 结果里挑出多线路信息：[{label, url, weight, selected}]
+function _lines(resolveData) {
+    var out = [];
+    var opts = (resolveData && resolveData.line_options) || [];
+    opts.forEach(function (o) {
+        if (o && o.url && /\.m3u8|\.mp4|\.flv/i.test(o.url)) {
+            out.push({
+                label: o.display_label || o.provider_name || o.label || '默认线路',
+                url: o.url,
+                weight: o.preference_weight || 0,
+                selected: !!o.selected,
+            });
+        }
+    });
+    // 兜底：没有 line_options 就全文抓 m3u8
+    if (!out.length && resolveData) {
+        var seen = {};
+        function walk(o) {
+            if (!o) return;
+            if (typeof o === 'string') {
+                if (/https?:\/\/[^\s"']+\.(m3u8|mp4|flv)/i.test(o) && !seen[o]) { seen[o] = 1; out.push({ label: '默认线路', url: o, weight: 0, selected: true }); }
+                return;
+            }
+            if (Array.isArray(o)) { o.forEach(walk); return; }
+            if (typeof o === 'object') Object.keys(o).forEach(function (k) { if (k !== 'token' && k !== 'tokens') walk(o[k]); });
+        }
+        walk(resolveData);
+    }
+    out.sort(function (a, b) { return (b.selected - a.selected) || (b.weight - a.weight); });
+    return out;
 }
 
 // ===================== 入口（QuickJS：export default 工厂） =====================
@@ -169,87 +183,142 @@ function _cardToVod(c) {
 export default function createSpider(site) {
     site = site || {};
 
-    async function init(ext) {
-        // 无需额外配置
-    }
+    var _class = [
+        { type_id: 'series', type_name: '剧集' },
+        { type_id: 'movie', type_name: '电影' },
+        { type_id: 'anime', type_name: '动漫' },
+        { type_id: 'short_drama', type_name: '短剧' },
+        { type_id: 'variety', type_name: '综艺' },
+        { type_id: 'documentary', type_name: '纪录片' },
+    ];
+
+    async function init(ext) {}
 
     async function home(filter) {
-        return {
-            class: [
-                { type_id: 'series', type_name: '剧集' },
-                { type_id: 'movie', type_name: '电影' },
-                { type_id: 'anime', type_name: '动漫' },
-            ],
-        };
+        return { class: _class };
     }
 
     async function homeVod() {
-        var data = await _http('/v1/browse/catalog?limit=20&intent=latest_catalog&page=1');
-        var list = (data.cards || []).map(_cardToVod);
-        return { list: list };
+        var data = await _catalog({ intent: 'latest_catalog', page: 1 });
+        return { list: (data.cards || []).map(_cardToVod) };
     }
 
+    // 分类：服务端 kind= 真实过滤
     async function category(tid, pg, filter, extend) {
         pg = Number(pg) || 1;
-        var path = '/v1/browse/catalog?limit=20&intent=' + encodeURIComponent(tid) + '&page=' + pg;
-        var data = await _http(path);
+        var data = await _catalog({ kind: tid, page: pg });
         var cards = data.cards || [];
         var pag = data.pagination || {};
-        var pagecount = pag.has_more ? (pg + 50) : pg;
-        return {
-            page: pg,
-            pagecount: pagecount,
-            limit: 20,
-            list: cards.map(_cardToVod),
-        };
+        var pagecount = pag.total ? Math.ceil(pag.total / (pag.limit || 20)) : (pag.has_more ? pg + 1 : pg);
+        return { page: pg, pagecount: pagecount, limit: 20, list: cards.map(_cardToVod) };
     }
 
+    // 详情：多季展开 + 多线路分组
     async function detail(id) {
         var data = await _http('/v1/catalog/' + id);
-        var eps = data.episodes || [];
-        var playUrls = [];
-        eps.forEach(function (ep, i) {
-            var t = ep.title || ('第' + (i + 1) + '集');
-            playUrls.push(t + '$' + (ep.token || ep.id || ''));
-        });
+        var seasons = data.seasons || [];
+        var groups = []; // [{label, episodes:[{name, token}]}]
+
+        // 单季：直接用当前 episodes
+        function curGroup(label, eps) {
+            var list = [];
+            (eps || []).forEach(function (ep, i) {
+                list.push({ name: ep.title || ep.display_name || ('第' + (i + 1) + '集'), token: ep.token || '' });
+            });
+            if (list.length) groups.push({ label: label, episodes: list });
+        }
+
+        if (seasons.length > 1) {
+            // 多季：逐季取集数（最多 5 季，防请求爆炸）
+            var want = seasons.slice(0, 5);
+            for (var i = 0; i < want.length; i++) {
+                var s = want[i];
+                try {
+                    var sd = await _http('/v1/catalog/' + (s.variant_id || s.id));
+                    var lbl = s.season_label || s.title || ('第' + (i + 1) + '季');
+                    curGroup(lbl, sd.episodes || []);
+                } catch (e) { /* 单季失败跳过 */ }
+            }
+            if (!groups.length) curGroup('正片', data.episodes || []);
+        } else {
+            curGroup('正片', data.episodes || []);
+        }
+
+        // 用第1集解析一次，拿全部播放线路 → 每条线路一个播放组（播放器里可切换）
+        var providers = null;
+        var firstEp = groups.length && groups[0].episodes.length ? groups[0].episodes[0] : null;
+        if (firstEp && firstEp.token) {
+            try {
+                var res = await _http('/v1/playback/resolve/' + firstEp.token);
+                var lines = _lines(res);
+                if (lines.length > 1) {
+                    providers = lines.map(function (l) { return l.label; });
+                } else if (lines.length === 1) {
+                    providers = null; // 单线路无需分组
+                }
+            } catch (e) { providers = null; }
+        }
+
+        var playFrom = [], playUrl = [];
+        if (providers) {
+            providers.forEach(function (p) {
+                playFrom.push(p);
+                playUrl.push(groups.map(function (g) {
+                    var prefix = groups.length > 1 ? (g.label + ' ') : '';
+                    return g.episodes.map(function (ep) { return prefix + ep.name + '$' + ep.token; }).join('#');
+                }).join('#'));
+            });
+        } else {
+            groups.forEach(function (g) {
+                playFrom.push(g.label);
+                playUrl.push(g.episodes.map(function (ep) { return ep.name + '$' + ep.token; }).join('#'));
+            });
+        }
+
         var item = {
             vod_id: id,
-            vod_name: data.title || data.name || '',
-            vod_pic: data.poster_url || data.cover || '',
+            vod_name: data.title || '',
+            vod_pic: data.poster_url || '',
             vod_year: String(data.year || ''),
-            vod_remarks: eps.length ? ('全' + eps.length + '集') : '',
-            vod_content: data.description || data.synopsis || '',
-            vod_play_from: '搜剧AI',
-            vod_play_url: playUrls.join('#'),
+            vod_area: data.area || '',
+            vod_actor: (data.actors || []).slice(0, 8).join(' '),
+            vod_director: (data.directors || []).slice(0, 4).join(' '),
+            vod_remarks: data.remarks || (data.episode_count ? '全' + data.episode_count + '集' : ''),
+            vod_content: data.description || '',
+            vod_play_from: playFrom.join('$$$'),
+            vod_play_url: playUrl.join('$$$'),
         };
         return { list: [item] };
     }
 
+    // 搜索：服务端 q= 真搜索（带分页）
     async function search(key, quick, pg) {
         pg = Number(pg) || 1;
-        if (pg > 5) return { page: pg, pagecount: pg, list: [] };
-        var out = [];
-        for (var p = 1; p <= 10 && out.length < 60; p++) {
-            var data = await _http('/v1/browse/catalog?limit=20&intent=latest_catalog&page=' + p);
-            var cards = data.cards || [];
-            if (!cards.length) break;
-            cards.forEach(function (c) {
-                if (out.length < 60 && (c.title || '').indexOf(String(key)) >= 0) {
-                    out.push(_cardToVod(c));
-                }
-            });
-            if (!data.pagination || !data.pagination.has_more) break;
-        }
-        return { page: pg, pagecount: pg, list: out };
+        var data = await _catalog({ q: key, page: pg });
+        var pag = data.pagination || {};
+        var pagecount = pag.total ? Math.ceil(pag.total / (pag.limit || 20)) : 1;
+        return { page: pg, pagecount: pagecount, limit: 20, list: (data.cards || []).map(_cardToVod) };
     }
 
+    // 播放：resolve 该集，按线路 flag 匹配，失败回退 selected/最高权重
     async function play(flag, id, vipFlags) {
         if (!id) return { parse: 0, url: '' };
         if (id.indexOf('$') >= 0) id = id.split('$').pop();
         if (id.indexOf('http') === 0) return { parse: 0, url: id };
-        var data = await _http('/v1/playback/resolve/' + id);
-        var urls = _m3u8List(data);
-        return { parse: 0, url: urls[0] || '' };
+        var res = await _http('/v1/playback/resolve/' + id);
+        var lines = _lines(res);
+        if (!lines.length) return { parse: 0, url: '' };
+        var pick = null;
+        if (flag) {
+            for (var i = 0; i < lines.length; i++) {
+                if (lines[i].label === flag) { pick = lines[i]; break; }
+            }
+        }
+        if (!pick) {
+            for (i = 0; i < lines.length; i++) if (lines[i].selected) { pick = lines[i]; break; }
+        }
+        if (!pick) pick = lines[0]; // 已按 selected + weight 排序
+        return { parse: 0, url: pick.url, header: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36' } };
     }
 
     function proxy(params) { return null; }
