@@ -1,20 +1,18 @@
 /*
- * souju_spider.js — 搜剧AI(souju.ai) 的 FongMi/TV 影视TV 单采集源 (QuickJS / CatVod)
+ * souju_spider.js — 搜剧AI(souju.ai) 影视TV(FongMi/TV) 单采集源
  *
- * 用法（影视TV 配置里）：
- *   sites[]: { "key":"souju", "name":"搜剧AI souju.ai", "type":3,
- *              "api":"https://raw.githubusercontent.com/vgmr-99/Aberxy/main/souju_spider.js",
- *              "searchable":1, "playable":1 }
- * 整站即作为一个“单个采集源”按需浏览与点播，无需预解析。
+ * 遵循 FongMi/CatVodSpider QuickJS 官方契约：
+ *   - ES module：export default 为工厂函数 default(site) → 返回实例对象
+ *   - 方法：init/home/homeVod/category/detail/search/play/proxy/destroy
+ *   - 网络：注入的 net.http(url, {method,headers,timeout}) → {code, content, error}（异步，App await）
+ *   - 加密：内置纯 JS HMAC-SHA256（不依赖宿主 crypto，兼容性最好）
  *
- * 实现要点：
- *  - type=3 + api 以 .js 结尾 → 影视TV 用 QuickJS 加载本文件。
- *  - 内部复刻前端 HMAC-SHA256 签名调用 souju.ai 的 /v1/* 接口（纯 JS 实现，无外部依赖）。
- *  - 网络请求走 QuickJS 全局 net.req(url, {method,headers,timeout})，body 在 resp.content。
- *  - 方法名 / 返回结构遵循 CatVod 规范：home/category/detail/search/play。
+ * 配置（type 必须 3，api 以 .js 结尾）：
+ *   {"key":"souju","name":"搜剧AI souju.ai","type":3,
+ *    "api":"<本文件公网URL>","searchable":1,"playable":1}
  */
 
-// ===================== 纯 JS 工具：HMAC-SHA256（无 require/crypto 依赖） =====================
+// ===================== 纯 JS HMAC-SHA256（无依赖，已逐字节对验 node crypto） =====================
 function _randHex(n) {
     var s = '';
     for (var i = 0; i < n; i++) s += Math.floor(Math.random() * 16).toString(16);
@@ -35,176 +33,228 @@ function _hexToBytes(hex) {
     for (var i = 0; i < hex.length; i += 2) out.push(parseInt(hex.substr(i, 2), 16));
     return out;
 }
-function _sha256(msgStr) {
-    function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
-    var mathPow = Math.pow, maxWord = mathPow(2, 32), lengthProperty = 'length';
-    var i, j, result = '', words = [], asciiBitLength = msgStr.length * 8;
-    var hash = _sha256.h = _sha256.h || [], k = _sha256.k = _sha256.k || [], primeCounter = 0, isComposite = {};
-    for (var candidate = 2; primeCounter < 64; candidate++) {
-        if (!isComposite[candidate]) {
-            for (i = 0; i < 313; i += candidate) isComposite[i] = candidate;
-            hash[primeCounter] = (mathPow(candidate, .5) * maxWord) | 0;
-            k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
-        }
-    }
-    var ascii = msgStr + '\x80';
-    while (ascii.length % 64 - 56) ascii += '\x00';
-    for (i = 0; i < ascii.length; i++) { j = ascii.charCodeAt(i); words[i >> 2] |= j << ((3 - i) % 4) * 8; }
-    words[words.length] = ((asciiBitLength / maxWord) | 0);
-    words[words.length] = asciiBitLength;
-    for (j = 0; j < words.length;) {
-        var w = words.slice(j, j += 16), oldHash = hash, hash2 = hash.slice(0, 8);
-        for (i = 0; i < 64; i++) {
-            var i2 = i + j, w15 = w[i - 15], w2 = w[i - 2], a = hash2[0], e = hash2[4];
-            var temp1 = hash2[7]
-                + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
-                + ((e & hash2[5]) ^ ((~e) & hash2[6])) + k[i]
-                + (w[i] = (i < 16) ? w[i] : (
-                    w[i - 16] + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
-                    + w[i - 7] + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
-                ) | 0);
-            var temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
-                + ((a & hash2[1]) ^ (a & hash2[2]) ^ (hash2[1] & hash2[2]));
-            hash2 = [(temp1 + temp2) | 0].concat(hash2);
-            hash2[4] = (hash2[4] + temp1) | 0;
-        }
-        for (i = 0; i < 8; i++) hash2[i] = (hash2[i] + oldHash[i]) | 0;
-        hash = hash2;
-    }
-    for (i = 0; i < 8; i++) for (j = 3; j + 1; j--) {
-        var b = (hash[i] >> (j * 8)) & 255;
-        result += ((b < 16) ? 0 : '') + b.toString(16);
-    }
-    return result;
+function _bytesToStr(bytes) {
+    var s = '';
+    for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i] & 0xff);
+    return s;
 }
+
+var _K = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
+
+function _rotr(x, n) { return (x >>> n) | (x << (32 - n)); }
+
+function _sha256Bytes(bytes) {
+    var H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+    var len = bytes.length;
+    var bitLenHi = Math.floor(len / 0x20000000);
+    var bitLenLo = (len << 3) >>> 0;
+    var padded = bytes.slice();
+    padded.push(0x80);
+    while (padded.length % 64 !== 56) padded.push(0);
+    padded.push((bitLenHi >>> 24) & 0xff, (bitLenHi >>> 16) & 0xff, (bitLenHi >>> 8) & 0xff, bitLenHi & 0xff);
+    padded.push((bitLenLo >>> 24) & 0xff, (bitLenLo >>> 16) & 0xff, (bitLenLo >>> 8) & 0xff, bitLenLo & 0xff);
+    var w = new Array(64);
+    for (var i = 0; i < padded.length; i += 64) {
+        for (var t = 0; t < 16; t++) {
+            w[t] = (padded[i + t * 4] << 24) | (padded[i + t * 4 + 1] << 16) | (padded[i + t * 4 + 2] << 8) | padded[i + t * 4 + 3];
+        }
+        for (t = 16; t < 64; t++) {
+            var s0 = _rotr(w[t - 15], 7) ^ _rotr(w[t - 15], 18) ^ (w[t - 15] >>> 3);
+            var s1 = _rotr(w[t - 2], 17) ^ _rotr(w[t - 2], 19) ^ (w[t - 2] >>> 10);
+            w[t] = (w[t - 16] + s0 + w[t - 7] + s1) | 0;
+        }
+        var a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+        for (t = 0; t < 64; t++) {
+            var S1 = _rotr(e, 6) ^ _rotr(e, 11) ^ _rotr(e, 25);
+            var ch = (e & f) ^ (~e & g);
+            var temp1 = (h + S1 + ch + _K[t] + w[t]) | 0;
+            var S0 = _rotr(a, 2) ^ _rotr(a, 13) ^ _rotr(a, 22);
+            var maj = (a & b) ^ (a & c) ^ (b & c);
+            var temp2 = (S0 + maj) | 0;
+            h = g; g = f; f = e; e = (d + temp1) | 0;
+            d = c; c = b; b = a; a = (temp1 + temp2) | 0;
+        }
+        H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0;
+        H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+    }
+    var out = '';
+    for (i = 0; i < 8; i++) out += ('00000000' + ((H[i] >>> 0).toString(16))).slice(-8);
+    return out;
+}
+
+function _sha256Str(str) { return _sha256Bytes(_utf8Bytes(str)); }
+
 function _hmacSha256(keyStr, msgStr) {
-    var blockSize = 64;
-    var keyBytes = _utf8Bytes(keyStr);
-    if (keyBytes.length > blockSize) keyBytes = _hexToBytes(_sha256(keyStr));
-    while (keyBytes.length < blockSize) keyBytes.push(0);
+    var key = _utf8Bytes(keyStr);
+    if (key.length > 64) key = _hexToBytes(_sha256Bytes(key));
+    while (key.length < 64) key.push(0);
     var inner = [], outer = [];
-    for (var i = 0; i < blockSize; i++) { inner.push(keyBytes[i] ^ 0x36); outer.push(keyBytes[i] ^ 0x5c); }
-    var innerMsg = inner.concat(_utf8Bytes(msgStr));
-    var innerHash = _hexToBytes(_sha256(String.fromCharCode.apply(null, innerMsg)));
-    var outerMsg = outer.concat(innerHash);
-    return _sha256(String.fromCharCode.apply(null, outerMsg));
+    for (var i = 0; i < 64; i++) { inner.push(key[i] ^ 0x36); outer.push(key[i] ^ 0x5c); }
+    var innerHash = _hexToBytes(_sha256Bytes(inner.concat(_utf8Bytes(msgStr))));
+    return _sha256Bytes(outer.concat(innerHash));
 }
 
-// ===================== 站点常量 + 签名 + 请求 =====================
-var SITE = "https://souju.ai";
-var CI = "f39d73aa7a6426203cdee1ef17b31d3b7ea8c23f4c59c62a3a8aa0f39ee5e79d";
+// ===================== souju.ai API（HMAC 签名） =====================
+var CI = 'f39d73aa7a6426203cdee1ef17b31d3b7ea8c23f4c59c62a3a8aa0f39ee5e79d';
+var BASE = 'https://souju.ai';
 
-function _sign(method, path) {
+async function _http(path) {
     var ts = String(Date.now());
-    var nonce = _randHex(32);
-    var msg = method + "\n" + path + "\n" + ts + "\n" + nonce;
+    var no = _randHex(32);
+    var msg = 'GET\n' + path + '\n' + ts + '\n' + no;
     var sig = _hmacSha256(CI, msg);
-    return {
-        "x-ai-movie-timestamp": ts,
-        "x-ai-movie-nonce": nonce,
-        "x-ai-movie-signature": sig,
-        "Origin": SITE,
-        "Accept": "application/json",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36"
-    };
-}
-
-// 同步请求：走 QuickJS 全局 net.req；返回解析后的 JSON 对象
-function _get(path) {
-    var headers = _sign("GET", path);
-    var resp = net.req(SITE + path, { method: "GET", headers: headers, timeout: 15000, callTimeout: 15000 });
-    if (resp.error) throw new Error(resp.error);
-    if (resp.code < 200 || resp.code >= 300) throw new Error("HTTP " + resp.code);
+    var resp = await net.http(BASE + path, {
+        method: 'GET',
+        headers: {
+            'x-ai-movie-timestamp': ts,
+            'x-ai-movie-nonce': no,
+            'x-ai-movie-signature': sig,
+            'Accept': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36',
+            'Referer': 'https://souju.ai/',
+        },
+        timeout: 20000,
+    });
+    if (resp.error) throw new Error('HTTP失败: ' + resp.error);
     var body = resp.content;
-    if (typeof body !== "string") {
-        // 极少数情况下 content 为字节数组，转成字符串
-        body = String.fromCharCode.apply(null, Array.prototype.slice.call(body));
-    }
+    if (typeof body !== 'string') body = new TextDecoder().decode(body);
     return JSON.parse(body);
 }
 
-function _m3u8(body) {
-    var txt = typeof body === "string" ? body : JSON.stringify(body);
-    var set = {};
-    (txt.match(/https?:\/\/[^\s"']+?\.m3u8/g) || []).forEach(function (u) { set[u] = 1; });
-    return Object.keys(set);
-}
-
-// ===================== CatVod 接口（方法名与返回结构遵循规范） =====================
-function init(ext) {
-    // souju 无需初始化参数
-}
-
-function home(filter) {
-    return {
-        class: [
-            { type_id: "all", type_name: "全部" },
-            { type_id: "movie", type_name: "电影" },
-            { type_id: "series", type_name: "剧集" },
-            { type_id: "anime", type_name: "动漫" }
-        ]
-    };
-}
-
-function category(tid, pg, filter, extend) {
-    pg = pg || 1;
-    var data = _get("/v1/browse/catalog?limit=20&intent=latest_catalog&page=" + pg);
-    var cards = data.cards || [];
-    if (tid && tid !== "all") cards = cards.filter(function (c) { return (c.content_kind || "") === tid; });
-    var list = cards.map(function (c) {
-        return {
-            vod_id: c.id,
-            vod_name: c.title,
-            vod_pic: c.poster_url || "",
-            vod_remarks: [c.content_kind, c.year].filter(Boolean).join(" ")
-        };
-    });
-    var total = (data.pagination && data.pagination.total) || 0;
-    return { page: Number(pg), pagecount: Math.max(1, Math.ceil(total / 20)), list: list };
-}
-
-function detail(id) {
-    var vid = Array.isArray(id) ? id[0] : id;
-    var data = _get("/v1/catalog/" + vid);
-    var title = data.title || vid;
-    var eps = data.episodes || [];
-    // 每集 “集名$token” 用 # 连接；播放时 play() 取 token 现解析直链
-    var play = eps.map(function (e) {
-        return (e.title || ("第" + (e.number || "?") + "集")) + "$" + e.token;
-    }).join("#");
-    var item = {
-        vod_id: vid,
-        vod_name: title,
-        vod_pic: data.poster_url || "",
-        vod_content: data.description || "",
-        vod_play_from: "souju",
-        vod_play_url: play
-    };
-    return { list: [item] };
-}
-
-function search(key, quick, pg) {
-    pg = pg || 1;
+function _m3u8List(data) {
     var out = [];
-    for (var p = 1; p <= 10 && out.length < 60; p++) {
-        var data = _get("/v1/browse/catalog?limit=20&intent=latest_catalog&page=" + p);
-        (data.cards || []).forEach(function (c) {
-            if (out.length < 60 && (c.title || "").indexOf(String(key)) >= 0) {
-                out.push({ vod_id: c.id, vod_name: c.title, vod_pic: c.poster_url || "" });
-            }
-        });
+    var seen = {};
+    function push(u) {
+        if (!u || typeof u !== 'string' || !/\.m3u8|\.mp4|\.flv/.test(u)) return;
+        if (seen[u]) return;
+        seen[u] = 1;
+        out.push(u);
     }
-    return { page: Number(pg), pagecount: 1, list: out };
+    function walk(o) {
+        if (!o) return;
+        if (typeof o === 'string') { push(o); return; }
+        if (Array.isArray(o)) { o.forEach(walk); return; }
+        if (typeof o === 'object') {
+            Object.keys(o).forEach(function (k) {
+                if (/url|play|uri|source/i.test(k)) walk(o[k]);
+                else if (typeof o[k] === 'object') walk(o[k]);
+            });
+        }
+    }
+    walk(data);
+    return out;
 }
 
-function play(flag, id, vipFlags) {
-    if (!id) return { parse: 0, url: "" };
-    if (id.indexOf("$") >= 0) id = id.split("$").pop();   // 兼容 “flag$id”
-    if (id.indexOf("http") === 0) return { parse: 0, url: id };
-    var data = _get("/v1/playback/resolve/" + id);
-    var urls = _m3u8(data);
-    return { parse: 0, url: urls[0] || "" };
+function _cardToVod(c) {
+    var remark = '';
+    if (c.episode_count || c.episodes_count) remark = '更新至' + (c.episode_count || c.episodes_count) + '集';
+    else if (c.remark) remark = c.remark;
+    return {
+        vod_id: c.id,
+        vod_name: c.title || c.name || '',
+        vod_pic: c.poster_url || c.cover || '',
+        vod_remarks: remark,
+    };
 }
 
-// 可选：本地代理（一般无需）
-function proxy(params) { return null; }
+// ===================== 入口（QuickJS：export default 工厂） =====================
+
+export default function createSpider(site) {
+    site = site || {};
+
+    async function init(ext) {
+        // 无需额外配置
+    }
+
+    async function home(filter) {
+        return {
+            class: [
+                { type_id: 'series', type_name: '剧集' },
+                { type_id: 'movie', type_name: '电影' },
+                { type_id: 'anime', type_name: '动漫' },
+            ],
+        };
+    }
+
+    async function homeVod() {
+        var data = await _http('/v1/browse/catalog?limit=20&intent=latest_catalog&page=1');
+        var list = (data.cards || []).map(_cardToVod);
+        return { list: list };
+    }
+
+    async function category(tid, pg, filter, extend) {
+        pg = Number(pg) || 1;
+        var path = '/v1/browse/catalog?limit=20&intent=' + encodeURIComponent(tid) + '&page=' + pg;
+        var data = await _http(path);
+        var cards = data.cards || [];
+        var pag = data.pagination || {};
+        var pagecount = pag.has_more ? (pg + 50) : pg;
+        return {
+            page: pg,
+            pagecount: pagecount,
+            limit: 20,
+            list: cards.map(_cardToVod),
+        };
+    }
+
+    async function detail(id) {
+        var data = await _http('/v1/catalog/' + id);
+        var eps = data.episodes || [];
+        var playUrls = [];
+        eps.forEach(function (ep, i) {
+            var t = ep.title || ('第' + (i + 1) + '集');
+            playUrls.push(t + '$' + (ep.token || ep.id || ''));
+        });
+        var item = {
+            vod_id: id,
+            vod_name: data.title || data.name || '',
+            vod_pic: data.poster_url || data.cover || '',
+            vod_year: String(data.year || ''),
+            vod_remarks: eps.length ? ('全' + eps.length + '集') : '',
+            vod_content: data.description || data.synopsis || '',
+            vod_play_from: '搜剧AI',
+            vod_play_url: playUrls.join('#'),
+        };
+        return { list: [item] };
+    }
+
+    async function search(key, quick, pg) {
+        pg = Number(pg) || 1;
+        if (pg > 5) return { page: pg, pagecount: pg, list: [] };
+        var out = [];
+        for (var p = 1; p <= 10 && out.length < 60; p++) {
+            var data = await _http('/v1/browse/catalog?limit=20&intent=latest_catalog&page=' + p);
+            var cards = data.cards || [];
+            if (!cards.length) break;
+            cards.forEach(function (c) {
+                if (out.length < 60 && (c.title || '').indexOf(String(key)) >= 0) {
+                    out.push(_cardToVod(c));
+                }
+            });
+            if (!data.pagination || !data.pagination.has_more) break;
+        }
+        return { page: pg, pagecount: pg, list: out };
+    }
+
+    async function play(flag, id, vipFlags) {
+        if (!id) return { parse: 0, url: '' };
+        if (id.indexOf('$') >= 0) id = id.split('$').pop();
+        if (id.indexOf('http') === 0) return { parse: 0, url: id };
+        var data = await _http('/v1/playback/resolve/' + id);
+        var urls = _m3u8List(data);
+        return { parse: 0, url: urls[0] || '' };
+    }
+
+    function proxy(params) { return null; }
+
+    function destroy() {}
+
+    return { init, home, homeVod, category, detail, search, play, proxy, destroy };
+}
