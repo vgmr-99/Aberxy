@@ -1,18 +1,25 @@
 /*
- * souju_spider.js — 搜剧AI(souju.ai) 的 CatVod 风格采集源(spider)
- * 用法：影视TV(FongMi/TV) 配置里以 type=4 / api=本文件 raw URL 接入，
- *       整站即作为一个“单个采集源”按需浏览与点播，无需预解析。
- * 内部复刻前端 HMAC-SHA256 签名调用 souju.ai 的 /v1/* 接口。
- * 关键点：签名用纯 JS 实现，不依赖 require('crypto')，兼容任意 spider 引擎(含影视TV的 Java JS 引擎)。
+ * souju_spider.js — 搜剧AI(souju.ai) 的 FongMi/TV 影视TV 单采集源 (QuickJS / CatVod)
+ *
+ * 用法（影视TV 配置里）：
+ *   sites[]: { "key":"souju", "name":"搜剧AI souju.ai", "type":3,
+ *              "api":"https://raw.githubusercontent.com/vgmr-99/Aberxy/main/souju_spider.js",
+ *              "searchable":1, "playable":1 }
+ * 整站即作为一个“单个采集源”按需浏览与点播，无需预解析。
+ *
+ * 实现要点：
+ *  - type=3 + api 以 .js 结尾 → 影视TV 用 QuickJS 加载本文件。
+ *  - 内部复刻前端 HMAC-SHA256 签名调用 souju.ai 的 /v1/* 接口（纯 JS 实现，无外部依赖）。
+ *  - 网络请求走 QuickJS 全局 net.req(url, {method,headers,timeout})，body 在 resp.content。
+ *  - 方法名 / 返回结构遵循 CatVod 规范：home/category/detail/search/play。
  */
 
-// ---------- 纯 JS 工具 ----------
+// ===================== 纯 JS 工具：HMAC-SHA256（无 require/crypto 依赖） =====================
 function _randHex(n) {
     var s = '';
     for (var i = 0; i < n; i++) s += Math.floor(Math.random() * 16).toString(16);
     return s;
 }
-
 function _utf8Bytes(str) {
     var out = [];
     for (var i = 0; i < str.length; i++) {
@@ -23,20 +30,11 @@ function _utf8Bytes(str) {
     }
     return out;
 }
-
-function _bytesToStr(bytes) {
-    var s = '';
-    for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i] & 0xff);
-    return s;
-}
-
 function _hexToBytes(hex) {
     var out = [];
     for (var i = 0; i < hex.length; i += 2) out.push(parseInt(hex.substr(i, 2), 16));
     return out;
 }
-
-// 纯 JS SHA-256（geraintluff 实现，按 UTF-8 字节串运算）
 function _sha256(msgStr) {
     function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
     var mathPow = Math.pow, maxWord = mathPow(2, 32), lengthProperty = 'length';
@@ -79,7 +77,6 @@ function _sha256(msgStr) {
     }
     return result;
 }
-
 function _hmacSha256(keyStr, msgStr) {
     var blockSize = 64;
     var keyBytes = _utf8Bytes(keyStr);
@@ -88,131 +85,126 @@ function _hmacSha256(keyStr, msgStr) {
     var inner = [], outer = [];
     for (var i = 0; i < blockSize; i++) { inner.push(keyBytes[i] ^ 0x36); outer.push(keyBytes[i] ^ 0x5c); }
     var innerMsg = inner.concat(_utf8Bytes(msgStr));
-    var innerHash = _hexToBytes(_sha256(_bytesToStr(innerMsg)));
+    var innerHash = _hexToBytes(_sha256(String.fromCharCode.apply(null, innerMsg)));
     var outerMsg = outer.concat(innerHash);
-    return _sha256(_bytesToStr(outerMsg));
+    return _sha256(String.fromCharCode.apply(null, outerMsg));
 }
 
-// ---------- Spider 类 ----------
-var Spider = class {
-    constructor() {
-        this.siteUrl = "https://souju.ai";
-        this.ci = "f39d73aa7a6426203cdee1ef17b31d3b7ea8c23f4c59c62a3a8aa0f39ee5e79d";
+// ===================== 站点常量 + 签名 + 请求 =====================
+var SITE = "https://souju.ai";
+var CI = "f39d73aa7a6426203cdee1ef17b31d3b7ea8c23f4c59c62a3a8aa0f39ee5e79d";
+
+function _sign(method, path) {
+    var ts = String(Date.now());
+    var nonce = _randHex(32);
+    var msg = method + "\n" + path + "\n" + ts + "\n" + nonce;
+    var sig = _hmacSha256(CI, msg);
+    return {
+        "x-ai-movie-timestamp": ts,
+        "x-ai-movie-nonce": nonce,
+        "x-ai-movie-signature": sig,
+        "Origin": SITE,
+        "Accept": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36"
+    };
+}
+
+// 同步请求：走 QuickJS 全局 net.req；返回解析后的 JSON 对象
+function _get(path) {
+    var headers = _sign("GET", path);
+    var resp = net.req(SITE + path, { method: "GET", headers: headers, timeout: 15000, callTimeout: 15000 });
+    if (resp.error) throw new Error(resp.error);
+    if (resp.code < 200 || resp.code >= 300) throw new Error("HTTP " + resp.code);
+    var body = resp.content;
+    if (typeof body !== "string") {
+        // 极少数情况下 content 为字节数组，转成字符串
+        body = String.fromCharCode.apply(null, Array.prototype.slice.call(body));
     }
+    return JSON.parse(body);
+}
 
-    async init(cfg) { this.cfg = cfg || {}; }
+function _m3u8(body) {
+    var txt = typeof body === "string" ? body : JSON.stringify(body);
+    var set = {};
+    (txt.match(/https?:\/\/[^\s"']+?\.m3u8/g) || []).forEach(function (u) { set[u] = 1; });
+    return Object.keys(set);
+}
 
-    _sign(method, path) {
-        const ts = Date.now().toString();
-        const nonce = _randHex(32);
-        const msg = method + "\n" + path + "\n" + ts + "\n" + nonce;
-        const sig = _hmacSha256(this.ci, msg);
+// ===================== CatVod 接口（方法名与返回结构遵循规范） =====================
+function init(ext) {
+    // souju 无需初始化参数
+}
+
+function home(filter) {
+    return {
+        class: [
+            { type_id: "all", type_name: "全部" },
+            { type_id: "movie", type_name: "电影" },
+            { type_id: "series", type_name: "剧集" },
+            { type_id: "anime", type_name: "动漫" }
+        ]
+    };
+}
+
+function category(tid, pg, filter, extend) {
+    pg = pg || 1;
+    var data = _get("/v1/browse/catalog?limit=20&intent=latest_catalog&page=" + pg);
+    var cards = data.cards || [];
+    if (tid && tid !== "all") cards = cards.filter(function (c) { return (c.content_kind || "") === tid; });
+    var list = cards.map(function (c) {
         return {
-            'x-ai-movie-timestamp': ts,
-            'x-ai-movie-nonce': nonce,
-            'x-ai-movie-signature': sig,
-            'Origin': this.siteUrl,
-            'Accept': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36'
-        };
-    }
-
-    async _get(path) {
-        const headers = this._sign('GET', path);
-        const url = this.siteUrl + path;
-        // 1) CatVod 运行时自带 this._request(url, headers)
-        if (typeof this._request === 'function') {
-            const body = await this._request(url, headers);
-            return typeof body === 'string' ? JSON.parse(body) : body;
-        }
-        // 2) 现代运行时全局 fetch
-        if (typeof fetch === 'function') {
-            const r = await fetch(url, { headers });
-            return JSON.parse(await r.text());
-        }
-        // 3) Node https 兜底（仅本地测试用）
-        return await new Promise((resolve, reject) => {
-            const https = require('https');
-            const req = https.request(url, { method: 'GET', headers }, res => {
-                let d = '';
-                res.on('data', c => d += c);
-                res.on('end', () => { try { resolve(JSON.parse(d)); } catch (e) { reject(e); } });
-            });
-            req.on('error', reject);
-            req.end();
-        });
-    }
-
-    _m3u8(body) {
-        const txt = typeof body === 'string' ? body : JSON.stringify(body);
-        const set = {};
-        (txt.match(/https?:\/\/[^\s"']+?\.m3u8/g) || []).forEach(u => set[u] = 1);
-        return Object.keys(set);
-    }
-
-    // ---------- CatVod 接口 ----------
-    async home() {
-        return { class: [
-            { type_id: 'all', type_name: '全部' },
-            { type_id: 'movie', type_name: '电影' },
-            { type_id: 'series', type_name: '剧集' },
-            { type_id: 'anime', type_name: '动漫' }
-        ] };
-    }
-
-    async category(tid, pg, filter, extend) {
-        pg = pg || 1;
-        const data = await this._get(`/v1/browse/catalog?limit=20&intent=latest_catalog&page=${pg}`);
-        let cards = data.cards || [];
-        if (tid && tid !== 'all') cards = cards.filter(c => (c.content_kind || '') === tid);
-        const list = cards.map(c => ({
             vod_id: c.id,
             vod_name: c.title,
-            vod_pic: c.poster_url || '',
-            vod_remarks: [c.content_kind, c.year].filter(Boolean).join(' ')
-        }));
-        const total = (data.pagination && data.pagination.total) || 0;
-        return { page: pg * 1, pagecount: Math.max(1, Math.ceil(total / 20)), list };
-    }
-
-    async detail(id) {
-        const data = await this._get(`/v1/catalog/${id}`);
-        const title = data.title || id;
-        const eps = data.episodes || [];
-        // 惰性解析：play_url 只放每集 token，点击时由 play() 现解析直链（取最新、按需）
-        const play = eps.map(e => `${e.title || ('第' + (e.number || '?') + '集')}$${e.token}`).join('#');
-        return {
-            list: [{
-                vod_id: id,
-                vod_name: title,
-                vod_pic: data.poster_url || '',
-                vod_content: data.description || '',
-                vod_play_url: play
-            }]
+            vod_pic: c.poster_url || "",
+            vod_remarks: [c.content_kind, c.year].filter(Boolean).join(" ")
         };
+    });
+    var total = (data.pagination && data.pagination.total) || 0;
+    return { page: Number(pg), pagecount: Math.max(1, Math.ceil(total / 20)), list: list };
+}
+
+function detail(id) {
+    var vid = Array.isArray(id) ? id[0] : id;
+    var data = _get("/v1/catalog/" + vid);
+    var title = data.title || vid;
+    var eps = data.episodes || [];
+    // 每集 “集名$token” 用 # 连接；播放时 play() 取 token 现解析直链
+    var play = eps.map(function (e) {
+        return (e.title || ("第" + (e.number || "?") + "集")) + "$" + e.token;
+    }).join("#");
+    var item = {
+        vod_id: vid,
+        vod_name: title,
+        vod_pic: data.poster_url || "",
+        vod_content: data.description || "",
+        vod_play_from: "souju",
+        vod_play_url: play
+    };
+    return { list: [item] };
+}
+
+function search(key, quick, pg) {
+    pg = pg || 1;
+    var out = [];
+    for (var p = 1; p <= 10 && out.length < 60; p++) {
+        var data = _get("/v1/browse/catalog?limit=20&intent=latest_catalog&page=" + p);
+        (data.cards || []).forEach(function (c) {
+            if (out.length < 60 && (c.title || "").indexOf(String(key)) >= 0) {
+                out.push({ vod_id: c.id, vod_name: c.title, vod_pic: c.poster_url || "" });
+            }
+        });
     }
+    return { page: Number(pg), pagecount: 1, list: out };
+}
 
-    async search(wd) {
-        const out = [];
-        for (let pg = 1; pg <= 10 && out.length < 60; pg++) {
-            const data = await this._get(`/v1/browse/catalog?limit=20&intent=latest_catalog&page=${pg}`);
-            (data.cards || [])
-                .filter(c => (c.title || '').indexOf(wd) >= 0)
-                .forEach(c => out.push({ vod_id: c.id, vod_name: c.title, vod_pic: c.poster_url || '' }));
-        }
-        return { list: out };
-    }
+function play(flag, id, vipFlags) {
+    if (!id) return { parse: 0, url: "" };
+    if (id.indexOf("$") >= 0) id = id.split("$").pop();   // 兼容 “flag$id”
+    if (id.indexOf("http") === 0) return { parse: 0, url: id };
+    var data = _get("/v1/playback/resolve/" + id);
+    var urls = _m3u8(data);
+    return { parse: 0, url: urls[0] || "" };
+}
 
-    async play(flag, id) {
-        if (!id) return { parse: 0, url: '' };
-        if (id.indexOf('$') >= 0) id = id.split('$').pop();   // 兼容部分引擎传入 "flag$id"
-        if (id.indexOf('http') === 0) return { parse: 0, url: id };
-        const data = await this._get(`/v1/playback/resolve/${id}`);
-        const urls = this._m3u8(data);
-        return { parse: 0, url: urls[0] || '' };
-    }
-
-    async proxy(...args) { return null; }
-};
-
-if (typeof module !== 'undefined' && module.exports) module.exports = Spider;
+// 可选：本地代理（一般无需）
+function proxy(params) { return null; }
